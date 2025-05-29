@@ -1,0 +1,869 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Event Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+            .header h1 {
+                font-size: 2.5rem;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: 10px;
+            }
+
+        .auth-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e2e8f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .calendar-day {
+            background: white;
+            min-height: 120px;
+            padding: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+            .calendar-day:hover {
+                background: #f7fafc;
+            }
+
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+
+        .day-header {
+            background: #4a5568;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .event-item {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .event-item:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+        .event-volunteer {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .event-staff {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+        }
+
+        .event-training {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+        }
+
+        .event-social {
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #4a5568;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .slots-container {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .slot-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .signup-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .signup-item {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .current-user {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-grid {
+                font-size: 0.8rem;
+            }
+
+            .calendar-day {
+                min-height: 80px;
+                padding: 5px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Internal Event Calendar</h1>
+            <p>Manage and sign up for company events</p>
+
+            <div class="auth-section">
+                <span>Login as:</span>
+                <button class="btn btn-primary" onclick="loginAs('admin')">Staff Admin</button>
+                <button class="btn btn-secondary" onclick="loginAs('user')">Regular User</button>
+                <span class="current-user" id="currentUser">Not logged in</span>
+            </div>
+        </div>
+
+        <div class="admin-panel" id="adminPanel" style="display: none;">
+            <button class="btn btn-success" onclick="openCreateEventModal()">➕ Create New Event</button>
+            <button class="btn btn-warning" onclick="viewAllSignups()">📋 View All Signups</button>
+        </div>
+
+        <div class="main-content">
+            <div class="calendar-header">
+                <h2 id="currentMonth">December 2024</h2>
+                <div class="calendar-nav">
+                    <button class="btn btn-secondary" onclick="previousMonth()">‹ Previous</button>
+                    <button class="btn btn-secondary" onclick="nextMonth()">Next ›</button>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color event-volunteer"></div>
+                    <span>Volunteer</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color event-staff"></div>
+                    <span>Staff</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color event-training"></div>
+                    <span>Training</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color event-social"></div>
+                    <span>Social</span>
+                </div>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Calendar will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Event Modal -->
+    <div id="createEventModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('createEventModal')">&times;</span>
+            <h2>Create New Event</h2>
+            <form id="eventForm">
+                <div class="form-group">
+                    <label for="eventTitle">Event Title</label>
+                    <input type="text" id="eventTitle" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDate">Date</label>
+                    <input type="date" id="eventDate" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventTime">Time</label>
+                    <input type="time" id="eventTime" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDescription">Description</label>
+                    <textarea id="eventDescription" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventCategory">Category</label>
+                    <select id="eventCategory" class="form-control" required>
+                        <option value="volunteer">Volunteer</option>
+                        <option value="staff">Staff</option>
+                        <option value="training">Training</option>
+                        <option value="social">Social</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventSlots">Available Slots</label>
+                    <input type="number" id="eventSlots" class="form-control" min="1" value="10" required>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="emailNotifications"> Send email notifications for signups
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create Event</button>
+                <button type="button" class="btn btn-secondary" onclick="generateEmailLink()">📧 Generate Email Link</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div id="eventDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('eventDetailsModal')">&times;</span>
+            <div id="eventDetailsContent">
+                <!-- Event details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signupModal')">&times;</span>
+            <h2>Sign Up for Event</h2>
+            <div id="signupEventTitle"></div>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="userName">Your Name</label>
+                    <input type="text" id="userName" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-success">Sign Me Up!</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- All Signups Modal -->
+    <div id="allSignupsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('allSignupsModal')">&times;</span>
+            <h2>All Event Signups</h2>
+            <div id="allSignupsContent">
+                <!-- All signups will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentUser = null;
+        let currentDate = new Date();
+        let events = [];
+        let signups = {};
+
+        // Sample events for demonstration
+        const sampleEvents = [
+            {
+                id: 1,
+                title: "Holiday Volunteer Drive",
+                date: "2024-12-15",
+                time: "09:00",
+                description: "Help distribute holiday gifts to local families",
+                category: "volunteer",
+                slots: 15,
+                emailNotifications: true
+            },
+            {
+                id: 2,
+                title: "Staff Training: New Procedures",
+                date: "2024-12-18",
+                time: "14:00",
+                description: "Mandatory training on updated company procedures",
+                category: "training",
+                slots: 25,
+                emailNotifications: true
+            },
+            {
+                id: 3,
+                title: "Holiday Party",
+                date: "2024-12-20",
+                time: "18:00",
+                description: "Annual company holiday celebration",
+                category: "social",
+                slots: 50,
+                emailNotifications: false
+            }
+        ];
+
+        // Initialize app
+        function init() {
+            events = [...sampleEvents];
+            signups = {
+                1: [
+                    { name: "John Smith", timestamp: new Date().toISOString() },
+                    { name: "Jane Doe", timestamp: new Date().toISOString() }
+                ],
+                2: [
+                    { name: "Mike Johnson", timestamp: new Date().toISOString() }
+                ]
+            };
+            renderCalendar();
+        }
+
+        // Authentication
+        function loginAs(role) {
+            currentUser = role;
+            document.getElementById('currentUser').textContent = role === 'admin' ? 'Staff Admin' : 'Regular User';
+            document.getElementById('adminPanel').style.display = role === 'admin' ? 'block' : 'none';
+        }
+
+        // Calendar Navigation
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        // Calendar Rendering
+        function renderCalendar() {
+            console.log('Rendering calendar with', events.length, 'events');
+
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+
+            document.getElementById('currentMonth').textContent =
+                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            // Day headers
+            const dayHeaders = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            dayHeaders.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+
+            // Calendar days
+            for (let i = 0; i < 42; i++) {
+                const currentDay = new Date(startDate);
+                currentDay.setDate(startDate.getDate() + i);
+
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = currentDay.getDate();
+
+                if (currentDay.getMonth() !== currentDate.getMonth()) {
+                    dayNumber.style.color = '#cbd5e0';
+                }
+
+                dayElement.appendChild(dayNumber);
+
+                // Add events for this day
+                const dayEvents = events.filter(event => {
+                    const eventDate = new Date(event.date + 'T00:00:00'); // Ensure consistent date parsing
+                    const currentDayDate = new Date(currentDay.getFullYear(), currentDay.getMonth(), currentDay.getDate());
+                    return eventDate.toDateString() === currentDayDate.toDateString();
+                });
+
+                console.log(`Day ${currentDay.toDateString()} has ${dayEvents.length} events:`, dayEvents);
+
+                dayEvents.forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = `event-item event-${event.category}`;
+                    eventElement.textContent = event.title;
+                    eventElement.onclick = () => openEventDetails(event);
+                    dayElement.appendChild(eventElement);
+                });
+
+                calendarGrid.appendChild(dayElement);
+            }
+
+            console.log('Calendar rendered successfully');
+        }
+
+        // Event Management
+        function openCreateEventModal() {
+            if (currentUser !== 'admin') {
+                alert('Only staff admins can create events');
+                return;
+            }
+
+            // Set default date to today
+            const today = new Date();
+            const dateStr = today.getFullYear() + '-' +
+                          String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                          String(today.getDate()).padStart(2, '0');
+            document.getElementById('eventDate').value = dateStr;
+
+            document.getElementById('createEventModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openEventDetails(event) {
+            const modal = document.getElementById('eventDetailsModal');
+            const content = document.getElementById('eventDetailsContent');
+
+            const signupCount = signups[event.id] ? signups[event.id].length : 0;
+            const availableSlots = event.slots - signupCount;
+
+            content.innerHTML = `
+                <h2>${event.title}</h2>
+                <p><strong>Date:</strong> ${new Date(event.date).toLocaleDateString()}</p>
+                <p><strong>Time:</strong> ${event.time}</p>
+                <p><strong>Category:</strong> ${event.category}</p>
+                <p><strong>Description:</strong> ${event.description}</p>
+
+                <div class="slots-container">
+                    <h3>Availability</h3>
+                    <div class="slot-item">
+                        <span>Available Slots</span>
+                        <span>${availableSlots} / ${event.slots}</span>
+                    </div>
+                </div>
+
+                ${currentUser !== 'admin' && availableSlots > 0 ?
+                    `<button class="btn btn-success" onclick="openSignupModal(${event.id})">Sign Up</button>` :
+                    ''}
+
+                ${currentUser === 'admin' ? `
+                    <div class="signup-list">
+                        <h3>Current Signups (${signupCount})</h3>
+                        ${signups[event.id] ? signups[event.id].map(signup => `
+                            <div class="signup-item">
+                                <span>${signup.name}</span>
+                                <small>${new Date(signup.timestamp).toLocaleString()}</small>
+                            </div>
+                        `).join('') : '<p>No signups yet</p>'}
+                    </div>
+                    <button class="btn btn-warning" onclick="generateEventEmail(${event.id})">📧 Email Event Details</button>
+                ` : ''}
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        function openSignupModal(eventId) {
+            const event = events.find(e => e.id === eventId);
+            document.getElementById('signupEventTitle').innerHTML = `<h3>${event.title}</h3>`;
+            document.getElementById('signupModal').style.display = 'block';
+
+            document.getElementById('signupForm').onsubmit = function(e) {
+                e.preventDefault();
+                const userName = document.getElementById('userName').value;
+                signUpForEvent(eventId, userName);
+            };
+        }
+
+        function signUpForEvent(eventId, userName) {
+            if (!signups[eventId]) {
+                signups[eventId] = [];
+            }
+
+            // Check if user already signed up
+            const existingSignup = signups[eventId].find(signup => signup.name === userName);
+            if (existingSignup) {
+                alert('You have already signed up for this event!');
+                return;
+            }
+
+            const event = events.find(e => e.id === eventId);
+            const currentSignups = signups[eventId].length;
+
+            if (currentSignups >= event.slots) {
+                alert('Sorry, this event is full!');
+                return;
+            }
+
+            signups[eventId].push({
+                name: userName,
+                timestamp: new Date().toISOString()
+            });
+
+            // Send notification email if enabled
+            if (event.emailNotifications) {
+                sendSignupNotification(event, userName);
+            }
+
+            alert('Successfully signed up!');
+            closeModal('signupModal');
+            closeModal('eventDetailsModal');
+            document.getElementById('userName').value = '';
+        }
+
+        function sendSignupNotification(event, userName) {
+            const emailBody = `New signup for ${event.title}!\n\nParticipant: ${userName}\nEvent Date: ${event.date}\nEvent Time: ${event.time}`;
+            console.log('Email notification sent:', emailBody);
+        }
+
+        function generateEmailLink() {
+            const title = document.getElementById('eventTitle').value;
+            const date = document.getElementById('eventDate').value;
+            const time = document.getElementById('eventTime').value;
+            const description = document.getElementById('eventDescription').value;
+
+            if (!title || !date || !time) {
+                alert('Please fill in the event title, date, and time first');
+                return;
+            }
+
+            const subject = `New Event: ${title}`;
+            const body = `Event Details:\n\nTitle: ${title}\nDate: ${new Date(date).toLocaleDateString()}\nTime: ${time}\nDescription: ${description}\n\nPlease check the internal calendar for more details and to sign up.`;
+
+            const emailLink = `mailto:staff@company.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(emailLink);
+        }
+
+        function generateEventEmail(eventId) {
+            const event = events.find(e => e.id === eventId);
+            const subject = `Event Reminder: ${event.title}`;
+            const body = `Event Details:\n\nTitle: ${event.title}\nDate: ${new Date(event.date).toLocaleDateString()}\nTime: ${event.time}\nDescription: ${event.description}\n\nCurrent signups: ${signups[event.id] ? signups[event.id].length : 0}/${event.slots}`;
+
+            const emailLink = `mailto:staff@company.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(emailLink);
+        }
+
+        function viewAllSignups() {
+            if (currentUser !== 'admin') {
+                alert('Only staff admins can view all signups');
+                return;
+            }
+
+            const modal = document.getElementById('allSignupsModal');
+            const content = document.getElementById('allSignupsContent');
+
+            let html = '';
+            events.forEach(event => {
+                const eventSignups = signups[event.id] || [];
+                html += `
+                    <div class="event-signups">
+                        <h3>${event.title} - ${new Date(event.date).toLocaleDateString()}</h3>
+                        <p>Signups: ${eventSignups.length}/${event.slots}</p>
+                        <div class="signup-list">
+                            ${eventSignups.length > 0 ? eventSignups.map(signup => `
+                                <div class="signup-item">
+                                    <span>${signup.name}</span>
+                                    <small>${new Date(signup.timestamp).toLocaleString()}</small>
+                                </div>
+                            `).join('') : '<p>No signups yet</p>'}
+                        </div>
+                    </div>
+                    <hr style="margin: 20px 0;">
+                `;
+            });
+
+            content.innerHTML = html;
+            modal.style.display = 'block';
+        }
+
+        // Event Form Submission
+        function setupEventForm() {
+            console.log('Setting up event form...');
+            const form = document.getElementById('eventForm');
+            console.log('Form found:', form);
+
+            if (form) {
+                // Remove any existing event listeners
+                form.onsubmit = null;
+
+                form.addEventListener('submit', function(e) {
+                    console.log('Form submitted!');
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Get form values
+                    const title = document.getElementById('eventTitle').value.trim();
+                    const date = document.getElementById('eventDate').value;
+                    const time = document.getElementById('eventTime').value;
+                    const description = document.getElementById('eventDescription').value.trim();
+                    const category = document.getElementById('eventCategory').value;
+                    const slots = parseInt(document.getElementById('eventSlots').value) || 10;
+                    const emailNotifications = document.getElementById('emailNotifications').checked;
+
+                    console.log('Form values:', { title, date, time, description, category, slots, emailNotifications });
+
+                    // Validate required fields
+                    if (!title || !date || !time) {
+                        alert('Please fill in all required fields (Title, Date, Time)');
+                        return false;
+                    }
+
+                    const newEvent = {
+                        id: Date.now(),
+                        title: title,
+                        date: date,
+                        time: time,
+                        description: description,
+                        category: category,
+                        slots: slots,
+                        emailNotifications: emailNotifications
+                    };
+
+                    console.log('Creating new event:', newEvent);
+                    console.log('Events before:', events.length);
+
+                    events.push(newEvent);
+                    console.log('Events after:', events.length);
+                    console.log('All events:', events);
+
+                    renderCalendar();
+                    closeModal('createEventModal');
+
+                    // Reset form
+                    form.reset();
+
+                    alert(`Event "${title}" created successfully!`);
+                    return false;
+                });
+
+                console.log('Event listener attached to form');
+            } else {
+                console.error('Event form not found!');
+            }
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        };
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>
