@@ -131,10 +131,12 @@ async function startServer() {
     await initializeDataFile();
     
     app.listen(PORT, '0.0.0.0', () => {
-        console.log(`PD13 Event Calendar Server running on http://localhost:${PORT}`);
-        console.log(`Access the calendar at: http://localhost:${PORT}`);
-        console.log(`API endpoint: http://localhost:${PORT}/api/data`);
-        console.log(`Health check: http://localhost:${PORT}/health`);
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Server bound to 0.0.0.0:${PORT}`);
+        console.log(`Local access: http://localhost:${PORT}`);
+        console.log(`Network access: http://10.172.1.63:${PORT}`);
+        console.log(`API endpoint: http://10.172.1.63:${PORT}/api/data`);
+        console.log(`Calendar URL: http://10.172.1.63:${PORT}`);
     });
 }
 
