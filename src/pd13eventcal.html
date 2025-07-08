@@ -1210,7 +1210,7 @@ init().catch(err => console.error('Initialization failed:', err));
                 async function saveData() {
             try {
                 const data = { events, signups, tags, categories };
-                const response = await fetch('http://10.172.1.63:3000/api/data', {
+                const response = await fetch('http://10.172.1.57:3000/api/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -1226,7 +1226,7 @@ init().catch(err => console.error('Initialization failed:', err));
 
                 async function loadData() {
             try {
-                const response = await fetch('http://10.172.1.63:3000/api/data');
+                const response = await fetch('http://10.172.1.57:3000/api/data');
                 if (!response.ok) throw new Error('Failed to load data');
                 const data = await response.json();
                 events = data.events || [];
@@ -2216,7 +2216,7 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
             }
 
             const subject = `New Event: ${title}`;
-            const body = `Event Details:\n\nTitle: ${title}\nDate: ${parseLocalDate(date).toLocaleDateString()}\nTime: ${time}\nDescription: ${description}\n\nTo sign up for this event, visit our calendar at:\nhttp://10.172.1.63:8000\n\nPlease check the internal calendar for more details and to sign up.`;
+            const body = `Event Details:\n\nTitle: ${title}\nDate: ${parseLocalDate(date).toLocaleDateString()}\nTime: ${time}\nDescription: ${description}\n\nTo sign up for this event, visit our calendar at:\nhttp://10.172.1.57:8000\n\nPlease check the internal calendar for more details and to sign up.`;
 
             const emailLink = `mailto:clarym@pd13.state.fl.us?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(emailLink);
@@ -2225,7 +2225,7 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
         function generateEventEmail(eventId) {
             const event = events.find(e => e.id === eventId);
             const subject = `Event Reminder: ${event.title}`;
-            const body = `Event Details:\n\nTitle: ${event.title}\nDate: ${parseLocalDate(event.date).toLocaleDateString()}\nTime: ${event.time}\nDescription: ${event.description}\n\nCurrent signups: ${signups[event.id] ? signups[event.id].length : 0}/${event.slots}\n\nTo sign up for this event, visit our calendar at:\nhttp://10.172.1.63:8000`;
+            const body = `Event Details:\n\nTitle: ${event.title}\nDate: ${parseLocalDate(event.date).toLocaleDateString()}\nTime: ${event.time}\nDescription: ${event.description}\n\nCurrent signups: ${signups[event.id] ? signups[event.id].length : 0}/${event.slots}\n\nTo sign up for this event, visit our calendar at:\nhttp://10.172.1.57:8000`;
 
             const emailLink = `mailto:staff@company.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(emailLink);
