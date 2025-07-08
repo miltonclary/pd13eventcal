@@ -1210,7 +1210,7 @@ init().catch(err => console.error('Initialization failed:', err));
                 async function saveData() {
             try {
                 const data = { events, signups, tags, categories };
-                const response = await fetch('http://10.172.1.63:8000/api/data', {
+                const response = await fetch('http://10.172.1.63:3000/api/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -1226,7 +1226,7 @@ init().catch(err => console.error('Initialization failed:', err));
 
                 async function loadData() {
             try {
-                const response = await fetch('http://10.172.1.63:8000/api/data');
+                const response = await fetch('http://10.172.1.63:3000/api/data');
                 if (!response.ok) throw new Error('Failed to load data');
                 const data = await response.json();
                 events = data.events || [];
