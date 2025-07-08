@@ -1156,35 +1156,6 @@
         let currentSignupPositionId = null;
         let editingEventId = null;
  
-        // Initialize default categories if not exists
-        function initializeDefaultCategories() {
-            const defaultCategories = [
-                { id: 'community', name: 'Community Events & Celebrations', color: 'linear-gradient(135deg, #4CAF50, #8BC34A)', description: 'Parades, festivals, holiday events, toy drives' },
-                { id: 'service', name: 'Service & Volunteer Opportunities', color: 'linear-gradient(135deg, #2196F3, #03A9F4)', description: 'Paint Your Heart Out Tampa, Trinity Cafe, food drives' },
-                { id: 'educational', name: 'Educational & Awareness Events', color: 'linear-gradient(135deg, #FF9800, #FFC107)', description: 'Speaking engagements, wellness fairs, voter registration' },
-                { id: 'civic', name: 'Civic Engagement', color: 'linear-gradient(135deg, #9C27B0, #E91E63)', description: 'City council meetings, town halls' },
-                { id: 'office', name: 'Office-Sponsored Events', color: 'linear-gradient(135deg, #009688, #4DB6AC)', description: 'Swearing-in ceremonies, intern recognition, bingo days' }
-            ];
-            
-            if (!localStorage.getItem('eventCategories')) {
-                localStorage.setItem('eventCategories', JSON.stringify(defaultCategories));
-            }
-        }
-
-        // Get categories from localStorage
-        function getCategories() {
-            const stored = localStorage.getItem('eventCategories');
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        // Save categories to localStorage
-        function saveCategories(categories) {
-            localStorage.setItem('eventCategories', JSON.stringify(categories));
-        }
-
-        // Initialize categories on page load
-        initializeDefaultCategories();
-        let categories = getCategories();
 
         // Admin users
         const adminUsers = {
@@ -1213,8 +1184,8 @@
         ];
 
         // Initialize app
-        function init() {
-            loadData();
+                async function init() {
+            await loadData();
             setupEventForm();
             setupAdminLoginForm();
             setupSignupForm();
@@ -1229,67 +1200,54 @@
             loginAs('public');
         }
 
+
+
+// Initialize the application
+init().catch(err => console.error('Initialization failed:', err));
+
+
         // Data persistence functions
-        function saveData() {
-            localStorage.setItem('pd13_events', JSON.stringify(events));
-            localStorage.setItem('pd13_tags', JSON.stringify(tags));
-            localStorage.setItem('pd13_signups', JSON.stringify(signups));
-            saveCategories(categories);
-            localStorage.setItem('pd13_admins', JSON.stringify(adminUsers));
+                async function saveData() {
+            try {
+                const data = { events, signups, tags, categories };
+                const response = await fetch('http://localhost:3000/api/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) throw new Error('Failed to save data');
+            } catch (err) {
+                console.error('Error saving data:', err);
+                alert('Error saving data. Please try again.');
+            }
         }
 
-        function loadData() {
-            // Load events
-            const savedEvents = localStorage.getItem('pd13_events');
-            if (savedEvents) {
-                events = JSON.parse(savedEvents);
-            } else {
-                // Initialize with sample data
-                events = [
-                    {
-                        id: 1,
-                        title: "Community Service Day",
-                        date: "2025-05-30",
-                        time: "09:00",
-                        location: "Community Center",
-                        contactPerson: "Sarah Johnson",
-                        description: "Help with community cleanup and volunteer activities",
-                        category: "service",
-                        tags: [1, 2],
-                        slots: 10,
-                        emailNotifications: true,
-                        createdBy: "manager@cityoffice.gov",
-                        createdAt: new Date().toISOString()
-                    }
-                ];
-            }
 
-            // Load tags
-            const savedTags = localStorage.getItem('pd13_tags');
-            if (savedTags) {
-                tags = JSON.parse(savedTags);
-            } else {
-                // Initialize with common tags
-                tags = commonTags.map((tag, index) => ({
-                    id: index + 1,
-                    name: tag.name,
-                    color: tag.color,
-                    description: "",
-                    createdBy: "system",
-                    createdAt: new Date().toISOString(),
-                    isActive: true
-                }));
-            }
 
-            // Load signups
-            const savedSignups = localStorage.getItem('pd13_signups');
-            if (savedSignups) {
-                signups = JSON.parse(savedSignups);
+                async function loadData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/data');
+                if (!response.ok) throw new Error('Failed to load data');
+                const data = await response.json();
+                events = data.events || [];
+                signups = data.signups || {};
+                tags = data.tags || [];
+                categories = data.categories || [];
+            } catch (err) {
+                console.error('Error loading data:', err);
+                alert('Failed to load data from server. Using default data.');
+                events = [];
+                signups = {};
+                tags = [];
+                categories = [];
             }
-
-            // Save initial data
-            saveData();
         }
+
+
+
+
+
+
 
         // Authentication functions
         function showAdminLogin() {
@@ -2258,16 +2216,16 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
             }
 
             const subject = `New Event: ${title}`;
-            const body = `Event Details:\n\nTitle: ${title}\nDate: ${parseLocalDate(date).toLocaleDateString()}\nTime: ${time}\nDescription: ${description}\n\nPlease check the internal calendar for more details and to sign up.`;
+            const body = `Event Details:\n\nTitle: ${title}\nDate: ${parseLocalDate(date).toLocaleDateString()}\nTime: ${time}\nDescription: ${description}\n\nTo sign up for this event, visit our calendar at:\nhttp://localhost:3000\n\nPlease check the internal calendar for more details and to sign up.`;
 
-            const emailLink = `mailto:staff@company.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            const emailLink = `mailto:clarym@pd13.state.fl.us?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(emailLink);
         }
 
         function generateEventEmail(eventId) {
             const event = events.find(e => e.id === eventId);
             const subject = `Event Reminder: ${event.title}`;
-            const body = `Event Details:\n\nTitle: ${event.title}\nDate: ${parseLocalDate(event.date).toLocaleDateString()}\nTime: ${event.time}\nDescription: ${event.description}\n\nCurrent signups: ${signups[event.id] ? signups[event.id].length : 0}/${event.slots}`;
+            const body = `Event Details:\n\nTitle: ${event.title}\nDate: ${parseLocalDate(event.date).toLocaleDateString()}\nTime: ${event.time}\nDescription: ${event.description}\n\nCurrent signups: ${signups[event.id] ? signups[event.id].length : 0}/${event.slots}\n\nTo sign up for this event, visit our calendar at:\nhttp://localhost:3000`;
 
             const emailLink = `mailto:staff@company.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(emailLink);
@@ -2435,7 +2393,6 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
                     ${eventSignups.length > 0 ? `
                         <div class="export-actions">
                             <button class="btn btn-secondary" onclick="exportSignupList(${eventId})">📋 Copy Signup List</button>
-                            <button class="btn btn-warning" onclick="generateEventEmail(${eventId})">📧 Email Event Details</button>
                         </div>
                     ` : ''}
                 </div>
@@ -2505,10 +2462,15 @@ exportText += `Signups (${eventSignups.length}/${event.slots}):\n\n`;
                     
                     const totalSlots = eventPositions.length > 0
                         ? eventPositions.reduce((sum, pos) => sum + pos.slots, 0)
-                        : 0; // If no positions, slots are 0 unless a general slot count is desired
+                        : 0;
 
-                    if (eventPositions.length === 0 && totalSlots === 0) {
-                        alert('Please add at least one volunteer position or ensure total slots are greater than 0.');
+                    if (eventPositions.length === 0) {
+                        alert('Please add at least one volunteer position.');
+                        return false;
+                    }
+
+                    if (totalSlots === 0) {
+                        alert('Please ensure volunteer positions have slots greater than 0.');
                         return false;
                     }
                     
