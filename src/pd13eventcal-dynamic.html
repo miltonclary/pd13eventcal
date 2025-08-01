@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PD13 Event Calendar</title>
+    <style>
+        /* Same styles as original file - truncated for brevity */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0099b5 0%, #00778f 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        /* ... rest of styles same as original ... */
+    </style>
+</head>
+<body>
+    <!-- Same HTML structure as original -->
+    
+    <script>
+        // FUTURE-PROOF API CONFIGURATION
+        // This automatically detects the correct server URL
+        function getApiBaseUrl() {
+            // Try to use the same host and port as the current page
+            const currentHost = window.location.hostname;
+            const currentPort = window.location.port || '3000';
+            
+            // If accessing via localhost, use localhost for API
+            if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+                return `http://localhost:3000`;
+            }
+            
+            // Otherwise use the current hostname with port 3000
+            return `http://${currentHost}:3000`;
+        }
+
+        const API_BASE_URL = getApiBaseUrl();
+        console.log('Using API Base URL:', API_BASE_URL);
+
+        // Application State
+        let currentUser = null;
+        let currentDate = new Date();
+        let events = [];
+        let tags = [];
+        let signups = {};
+        let eventPositions = [];
+        let positionIdCounter = 1;
+        let currentSignupEventId = null;
+        let currentSignupPositionId = null;
+        let editingEventId = null;
+
+        // Admin users
+        const adminUsers = {
+            "jonesdi@pd13.state.fl.us": {
+                password: "PD13isGreat!",
+                name: "Dionne Jones - Chief Strategy Officer",
+                role: "admin"
+            },
+            "johnsona@pd13.state.fl.us": {
+                password: "PD13isGreat!",
+                name: "Alexandra Johnson - Social Media/Content Creator",
+                role: "admin"
+            }
+        };
+
+        // Initialize app
+        async function init() {
+            await loadData();
+            setupEventForm();
+            setupAdminLoginForm();
+            setupSignupForm();
+            setupCancelSignupForm();
+            renderCalendar();
+            renderTagSelection();
+            renderExistingTags();
+            updateEventForm();
+            updateCalendarLegend();
+            
+            // Set default public access
+            loginAs('public');
+        }
+
+        // Data persistence functions - NOW USING DYNAMIC URL
+        async function saveData() {
+            try {
+                const data = { events, signups, tags, categories };
+                const response = await fetch(`${API_BASE_URL}/api/data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) throw new Error('Failed to save data');
+            } catch (err) {
+                console.error('Error saving data:', err);
+                alert('Error saving data. Please try again.');
+            }
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/data`);
+                if (!response.ok) throw new Error('Failed to load data');
+                const data = await response.json();
+                events = data.events || [];
+                signups = data.signups || {};
+                tags = data.tags || [];
+                categories = data.categories || [];
+            } catch (err) {
+                console.error('Error loading data:', err);
+                alert('Failed to load data from server. Using default data.');
+                events = [];
+                signups = {};
+                tags = [];
+                categories = [];
+            }
+        }
+
+        // ... rest of the JavaScript code same as original ...
+        
+        // Initialize the application
+        init().catch(err => console.error('Initialization failed:', err));
+    </script>
+</body>
+</html>
