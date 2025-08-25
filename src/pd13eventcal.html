@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PD13 Event Calendar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         * {
             margin: 0;
@@ -883,7 +884,7 @@
         <div class="header">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <img src="Lisa-Circular-PD-Logo-1-MIN.png" alt="PD13 Logo" width="62.5" height="62.5">
+                    <img src="src/Lisa-Circular-PD-Logo-1-MIN.png" alt="PD13 Logo" width="62.5" height="62.5">
                     <div>
                         <h1 style="margin: 0;">PD13 Event Calendar</h1>
                         <p style="margin: 5px 0 0 0;">Enhanced volunteer opportunity management system</p>
@@ -898,10 +899,10 @@
         </div>
 
         <div class="admin-panel" id="adminPanel" style="display: none;">
-            <button class="btn btn-success" onclick="openEventModal()">➕ Create New Event</button>
-            <button class="btn btn-warning" onclick="viewAllSignups()">📋 View All Signups</button>
-            <button class="btn btn-secondary" onclick="openTagManagementModal()">🏷️ Manage Tags</button>
-            <button class="btn btn-secondary" onclick="openCategoryManagement()">📁 Manage Categories</button>
+            <button class="btn btn-success" onclick="openEventModal()"><i class="fa fa-plus"></i> Create New Event</button>
+            <button class="btn btn-warning" onclick="viewAllSignups()"><i class="fa fa-list"></i> View All Signups</button>
+            <button class="btn btn-secondary" onclick="openTagManagementModal()"><i class="fa fa-tags"></i> Manage Tags</button>
+            <button class="btn btn-secondary" onclick="openCategoryManagement()"><i class="fa fa-folder"></i> Manage Categories</button>
         </div>
 
         <div class="main-content">
@@ -1037,7 +1038,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="eventSubmitButton">Create Event</button>
-                <button type="button" class="btn btn-secondary" onclick="generateEmailLink()">📧 Generate Email Link</button>
+                <button type="button" class="btn btn-secondary" onclick="generateEmailLink()"><i class="fa fa-envelope"></i> Generate Email Link</button>
             </form>
         </div>
     </div>
@@ -1102,7 +1103,7 @@
     <div id="categoryManagementModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-folder"></i> Manage Categories</h2>
+                <h2><i class="fa fa-folder"></i> Manage Categories</h2>
                 <span class="close" onclick="closeCategoryManagement()">&times;</span>
             </div>
             <div class="modal-body">
@@ -1210,7 +1211,7 @@ init().catch(err => console.error('Initialization failed:', err));
                 async function saveData() {
             try {
                 const data = { events, signups, tags, categories };
-                const response = await fetch('http://10.172.1.200:3000/api/data', {
+                const response = await fetch('http://10.172.1.63:3000/api/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -1226,7 +1227,7 @@ init().catch(err => console.error('Initialization failed:', err));
 
                 async function loadData() {
             try {
-                const response = await fetch('http://10.172.1.200:3000/api/data');
+                const response = await fetch('http://10.172.1.63:3000/api/data');
                 if (!response.ok) throw new Error('Failed to load data');
                 const data = await response.json();
                 events = data.events || [];
@@ -2063,9 +2064,9 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
                         `).join('') : '<p>No signups yet</p>'}
                     </div>
                     <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        <button class="btn btn-primary" onclick="closeModal('eventDetailsModal'); openEventModal(${event.id});">✏️ Edit Event</button>
-                        <button class="btn btn-warning" onclick="generateEventEmail(${event.id})">📧 Email Event Details</button>
-                        <button class="btn btn-danger" onclick="deleteEvent(${event.id})">🗑️ Delete Event</button>
+                        <button class="btn btn-primary" onclick="closeModal('eventDetailsModal'); openEventModal(${event.id});"><i class="fa fa-edit"></i> Edit Event</button>
+                        <button class="btn btn-warning" onclick="generateEventEmail(${event.id})"><i class="fa fa-envelope"></i> Email Event Details</button>
+                        <button class="btn btn-danger" onclick="deleteEvent(${event.id})"><i class="fa fa-trash"></i> Delete Event</button>
                     </div>
                 ` : ''}
             `;
@@ -2216,7 +2217,7 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
             }
 
             const subject = `New Event: ${title}`;
-            const body = `Event Details:\n\nTitle: ${title}\nDate: ${parseLocalDate(date).toLocaleDateString()}\nTime: ${time}\nDescription: ${description}\n\nTo sign up for this event, visit our calendar at:\nhttp://10.172.1.200:3000\n\nPlease check the internal calendar for more details and to sign up.`;
+            const body = `Event Details:\n\nTitle: ${title}\nDate: ${parseLocalDate(date).toLocaleDateString()}\nTime: ${time}\nDescription: ${description}\n\nTo sign up for this event, visit our calendar at:\nhttp://10.172.1.63:3000\n\nPlease check the internal calendar for more details and to sign up.`;
 
             const emailLink = `mailto:clarym@pd13.state.fl.us?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(emailLink);
@@ -2225,7 +2226,7 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
         function generateEventEmail(eventId) {
             const event = events.find(e => e.id === eventId);
             const subject = `Event Reminder: ${event.title}`;
-            const body = `Event Details:\n\nTitle: ${event.title}\nDate: ${parseLocalDate(event.date).toLocaleDateString()}\nTime: ${event.time}\nDescription: ${event.description}\n\nCurrent signups: ${signups[event.id] ? signups[event.id].length : 0}/${event.slots}\n\nTo sign up for this event, visit our calendar at:\nhttp://10.172.1.200:3000`;
+            const body = `Event Details:\n\nTitle: ${event.title}\nDate: ${parseLocalDate(event.date).toLocaleDateString()}\nTime: ${event.time}\nDescription: ${event.description}\n\nCurrent signups: ${signups[event.id] ? signups[event.id].length : 0}/${event.slots}\n\nTo sign up for this event, visit our calendar at:\nhttp://10.172.1.63:3000`;
 
             const emailLink = `mailto:staff@company.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(emailLink);
@@ -2302,7 +2303,7 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
             let html = `
                 <div class="signup-sections">
                     <div class="upcoming-events-section">
-                        <h3>📅 Upcoming Events (${upcomingEvents.length})</h3>
+                        <h3><i class="fa fa-calendar"></i> Upcoming Events (${upcomingEvents.length})</h3>
                         <div class="events-list">
                             ${upcomingEvents.length > 0 ? upcomingEvents.map(event => {
                                 const eventSignups = signups[event.id] || [];
@@ -2324,7 +2325,7 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
                     </div>
 
                     <div class="archive-section">
-                        <h3>📁 Archive - Past Events (${pastEvents.length})</h3>
+                        <h3><i class="fa fa-archive"></i> Archive - Past Events (${pastEvents.length})</h3>
                         <div class="events-list">
                             ${pastEvents.length > 0 ? pastEvents.map(event => {
                                 const eventSignups = signups[event.id] || [];
@@ -2371,7 +2372,7 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
                         <p><strong>Time:</strong> ${event.time}</p>
                         <p><strong>Category:</strong> ${categories.find(c => c.id === event.category)?.name || 'Uncategorized'}</p>
                         <p><strong>Description:</strong> ${event.description}</p>
-                        ${!isUpcoming ? '<span class="archive-badge">📁 Archived Event</span>' : ''}
+                        ${!isUpcoming ? '<span class="archive-badge"><i class="fa fa-archive"></i> Archived Event</span>' : ''}
                     </div>
 
                     <div class="signup-details">
@@ -2392,7 +2393,7 @@ function parseLocalDate(dateString) { // dateString is YYYY-MM-DD
 
                     ${eventSignups.length > 0 ? `
                         <div class="export-actions">
-                            <button class="btn btn-secondary" onclick="exportSignupList(${eventId})">📋 Copy Signup List</button>
+                            <button class="btn btn-secondary" onclick="exportSignupList(${eventId})"><i class="fa fa-clipboard"></i> Copy Signup List</button>
                         </div>
                     ` : ''}
                 </div>

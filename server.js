@@ -370,9 +370,9 @@ async function startServer() {
             });
             console.log(`\n🚀 PD13 Event Calendar Server running on http://localhost:${PORT}`);
             console.log(`📊 Health check: http://localhost:${PORT}/health`);
-            console.log(`🌐 Network access: http://10.172.1.200:${PORT}`);
-            console.log(`📊 API endpoint: http://10.172.1.200:${PORT}/api/data`);
-            console.log(`📅 Calendar URL: http://10.172.1.200:${PORT}`);
+            console.log(`🌐 Network access: http://10.172.1.63:${PORT}`);
+            console.log(`📊 API endpoint: http://10.172.1.63:${PORT}/api/data`);
+            console.log(`📅 Calendar URL: http://10.172.1.63:${PORT}`);
             console.log(`📁 Data file: ${DATA_FILE}`);
             console.log(`💾 Backups: ${BACKUP_DIR}`);
             console.log(`📝 Logs: ${LOG_DIR}`);

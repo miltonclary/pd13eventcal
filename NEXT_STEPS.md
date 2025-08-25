@@ -10,7 +10,7 @@
 ### Step 1: Test Your Calendar Right Now
 Open your web browser and go to:
 ```
-http://10.172.1.200:3000
+http://10.172.1.63:3000
 ```
 
 ### Step 2: Tell Me What You See
@@ -39,4 +39,4 @@ The page should show:
 Just tell me: "The calendar loads and looks good" or describe any issues you see.
 
 ---
-**Current Status**: Server running, ready to test at http://10.172.1.200:3000
+**Current Status**: Server running, ready to test at http://10.172.1.63:3000

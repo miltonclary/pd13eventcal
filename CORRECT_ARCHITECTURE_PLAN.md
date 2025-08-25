@@ -3,7 +3,7 @@
 ## 🎯 You're Right - Let's Clarify the Setup
 
 ### Current Architecture (What We Should Have):
-- **Webserver (10.172.1.200)**: Only Node.js runtime + minimal server code
+- **Webserver (10.172.1.63)**: Only Node.js runtime + minimal server code
 - **PDShare (W:\Ecal)**: All application files (HTML, images, data)
 - **Users**: Access calendar through webserver, but files served from network share
 

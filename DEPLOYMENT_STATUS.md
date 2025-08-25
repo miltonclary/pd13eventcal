@@ -3,7 +3,7 @@
 ## ✅ PHASE 1 COMPLETE - Core Application Ready!
 
 ### What We've Accomplished:
-1. **✅ IP Address Updates**: All references updated from old server (10.172.1.57/10.172.1.63) to new server (10.172.1.200)
+1. **✅ IP Address Updates**: All references updated to current server (10.172.1.63)
 2. **✅ Production Server**: Upgraded from basic server to production-ready version with:
    - Enhanced logging and error handling
    - Automatic backup system (hourly backups, keeps last 50)
@@ -22,18 +22,18 @@
 
 ### Step 1: Restart Server with New Production Version
 ```bash
-# On your new server (10.172.1.200), run:
+# On your server (10.172.1.63), run:
 restart-server.bat
 ```
 
 ### Step 2: Test Your Calendar Application
-1. Open browser and go to: **http://10.172.1.200:3000**
+1. Open browser and go to: **http://10.172.1.63:3000**
 2. You should see the complete PD13 Event Calendar
 3. Test admin login with existing credentials
 4. Create a test event to verify functionality
 
 ### Step 3: Verify Health Monitoring
-- Check health status: **http://10.172.1.200:3000/health**
+- Check health status: **http://10.172.1.63:3000/health**
 - Should show system status, memory usage, backup counts
 
 ## 📊 New Production Features Available:
@@ -83,23 +83,23 @@ restart-server.bat
 restart-server.bat
 
 # Check if server is running
-curl http://10.172.1.200:3000/health
+curl http://10.172.1.63:3000/health
 
 # View logs (if needed)
 type logs\application.log
 
 # Manual backup (if needed)
-curl -X POST http://10.172.1.200:3000/api/backup
+curl -X POST http://10.172.1.63:3000/api/backup
 ```
 
 ## 📞 Support Information:
-- **Calendar URL**: http://10.172.1.200:3000
-- **Health Check**: http://10.172.1.200:3000/health
-- **API Endpoint**: http://10.172.1.200:3000/api/data
+- **Calendar URL**: http://10.172.1.63:3000
+- **Health Check**: http://10.172.1.63:3000/health
+- **API Endpoint**: http://10.172.1.63:3000/api/data
 - **Data File**: `./data.json`
 - **Backups**: `./backups/`
 - **Logs**: `./logs/application.log`
 
 ---
 **Status**: Ready for production use! 🎉
-**Next Action**: Run `restart-server.bat` and test at http://10.172.1.200:3000
+**Next Action**: Run `restart-server.bat` and test at http://10.172.1.63:3000

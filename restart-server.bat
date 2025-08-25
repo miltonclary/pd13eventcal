@@ -10,7 +10,7 @@ timeout /t 2 /nobreak >nul
 
 echo.
 echo Starting PD13 Event Calendar Server...
-echo Server will be available at: http://10.172.1.200:3000
+echo Server will be available at: http://10.172.1.63:3000
 echo.
 
 node server.js

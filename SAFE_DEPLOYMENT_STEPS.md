@@ -8,7 +8,7 @@ Since you have other services running on the server, we'll deploy safely without
 
 ### Step 1: Check What's Currently Running
 ```cmd
-# Open Command Prompt on your server (10.172.1.200) and run:
+# Open Command Prompt on your server (10.172.1.63) and run:
 netstat -ano | findstr :3000
 ```
 **What this does**: Shows if anything is using port 3000
@@ -29,7 +29,7 @@ copy /Y src\pd13eventcal.html src\pd13eventcal.html.backup
 ### Step 3: Test Current Application
 ```cmd
 # Open your web browser and go to:
-http://10.172.1.200:3000
+http://10.172.1.63:3000
 ```
 **What to check**:
 - Does the page load?
@@ -39,13 +39,13 @@ http://10.172.1.200:3000
 ### Step 4: Check Server Health (Optional)
 ```cmd
 # In browser, go to:
-http://10.172.1.200:3000/health
+http://10.172.1.63:3000/health
 ```
 **Expected result**: Should show server status information
 
 ## 🔍 What We've Actually Done (No Server Restart Required)
 
-1. **✅ Updated IP Addresses**: All frontend code now points to 10.172.1.200
+1. **✅ Updated IP Addresses**: All frontend code now points to 10.172.1.63
 2. **✅ Prepared Production Server**: Enhanced server code ready when you're ready to upgrade
 3. **✅ Created Deployment Tools**: Scripts and documentation ready
 
@@ -62,7 +62,7 @@ After you complete Steps 1-3 above, please tell me:
 
 1. **Step 1 Result**: What did `netstat -ano | findstr :3000` show?
 2. **Step 3 Result**: 
-   - Does http://10.172.1.200:3000 load the calendar?
+   - Does http://10.172.1.63:3000 load the calendar?
    - Can you see the PD13 logo and calendar interface?
    - Does "Admin Login" button work?
 

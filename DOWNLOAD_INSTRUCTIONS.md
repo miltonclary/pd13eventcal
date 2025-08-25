@@ -25,7 +25,7 @@ C:\pd13eventcal\src\Lisa-Circular-PD-Logo-1-MIN.png
 ### Step 3: Test Your Calendar
 ```cmd
 # Your calendar should work at:
-http://10.172.1.200:3000
+http://10.172.1.63:3000
 ```
 
 ## 🔗 File Access Options:

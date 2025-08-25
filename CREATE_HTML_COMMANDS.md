@@ -21,7 +21,7 @@ notepad pd13eventcal.html
 ```cmd
 # Go back to main directory
 cd ..
-# Your calendar should now work at http://10.172.1.200:3000
+# Your calendar should now work at http://10.172.1.63:3000
 ```
 
 ## 📝 Ready for HTML Content?

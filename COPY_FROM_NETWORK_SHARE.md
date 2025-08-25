@@ -8,7 +8,7 @@ The files are already on \\pdshare in W:\Ecal. We just need to copy them to your
 Run these commands to show me what files you have:
 
 ```cmd
-# From your server (10.172.1.200), run:
+# From your server (10.172.1.63), run:
 dir W:\Ecal
 dir W:\Ecal\src
 ```
